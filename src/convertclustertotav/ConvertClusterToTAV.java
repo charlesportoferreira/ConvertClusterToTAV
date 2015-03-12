@@ -47,11 +47,14 @@ public class ConvertClusterToTAV {
         try (FileReader fr = new FileReader(oldFile); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
                 linha = br.readLine();
-                if (linha.contains("Attribute")) {
+                if (linha.contains("Attribute ")) {
                     br.readLine();
                     br.readLine();
                     while (br.ready()) {
                         linha = br.readLine();
+                        if(linha.length()<2){
+                            break;
+                        }
                         linha = linha.replaceAll("[\\s]+", ",");
                         linha = linha.replaceAll("K[0-9]+,", "");
                         linha = linha.replaceFirst("[0-9]+,|0\\.[0-9]+,", "");
@@ -92,7 +95,7 @@ public class ConvertClusterToTAV {
         try (FileReader fr = new FileReader(oldFile); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
                 linha = br.readLine();
-                if (linha.contains("Attribute")) {
+                if (linha.contains("Attribute ")) {
                     br.readLine();
                     br.readLine();
                     linha = br.readLine();
