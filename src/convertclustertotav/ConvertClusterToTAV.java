@@ -32,7 +32,6 @@ public class ConvertClusterToTAV {
         System.out.println(palavra);
         System.out.println(a);
         System.out.println(b);
-
         ConvertClusterToTAV c = new ConvertClusterToTAV();
         try {
             c.convert("arquivo.txt","newFile.arff");
