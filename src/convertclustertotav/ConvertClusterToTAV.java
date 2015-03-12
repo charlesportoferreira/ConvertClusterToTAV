@@ -44,6 +44,7 @@ public class ConvertClusterToTAV {
     private void convert(String oldFile, String newFile) throws FileNotFoundException, IOException {
         createHeader(oldFile, newFile);
         String linha;
+        String classes = getClasses();
         try (FileReader fr = new FileReader(oldFile); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
                 linha = br.readLine();
@@ -114,6 +115,17 @@ public class ConvertClusterToTAV {
             fr.close();
         }
         return 0;
+    }
+
+    private String getClasses() throws FileNotFoundException, IOException {
+        try (FileReader fr = new FileReader("classes.txt"); BufferedReader br = new BufferedReader(fr)) {
+            while (br.ready()) {
+                    return br.readLine();
+            }
+            br.close();
+            fr.close();
+        }
+        return "";
     }
 
 }
