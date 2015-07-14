@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,14 +36,14 @@ public class ConvertClusterToTAV {
         System.out.println(b);
         ConvertClusterToTAV c = new ConvertClusterToTAV();
         try {
-            c.convert("arquivo.txt","newFile.arff");
+            c.convert("arquivo.txt", "newFile.arff",new int[0]);
         } catch (IOException ex) {
             Logger.getLogger(ConvertClusterToTAV.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    private void convert(String oldFile, String newFile) throws FileNotFoundException, IOException {
+    private void convert(String oldFile, String newFile, int[] posicoes) throws FileNotFoundException, IOException {
         createHeader(oldFile, newFile);
         String linha;
         String classes = getClasses();
@@ -53,12 +55,17 @@ public class ConvertClusterToTAV {
                     br.readLine();
                     while (br.ready()) {
                         linha = br.readLine();
-                        if(linha.length()<2){
+                        if (linha.length() < 2) {
                             break;
                         }
                         linha = linha.replaceAll("[\\s]+", ",");
                         linha = linha.replaceAll("K[0-9]+,", "");
                         linha = linha.replaceFirst("[0-9]+,|0\\.[0-9]+,", "");
+                        ArrayList<String> li = new ArrayList<>(Arrays.asList(linha.split(",")));
+                        for (int posicao : posicoes) {
+                            li.remove(posicao);
+                        }
+                        linha = li.toString().replaceAll("\\[|\\]", "");
                         salvaLinhaDados("newFile.arff", linha);
                     }
                 }
@@ -120,7 +127,7 @@ public class ConvertClusterToTAV {
     private String getClasses() throws FileNotFoundException, IOException {
         try (FileReader fr = new FileReader("classes.txt"); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
-                    return br.readLine();
+                return br.readLine();
             }
             br.close();
             fr.close();
