@@ -26,27 +26,40 @@ public class ConvertClusterToTAV {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String texto = "K0              0.0608     0.0621          0";
-        String palavra = texto.replaceAll("[\\s]+", ",");
-        String a = palavra.replaceAll("K[0-9]+,", "");
-        String b = a.replaceFirst("[0-9]+,|0\\.[0-9]+,", "");
-        System.out.println(texto);
-        System.out.println(palavra);
-        System.out.println(a);
-        System.out.println(b);
+        if(args.length != 3){
+            help();
+        }
         ConvertClusterToTAV c = new ConvertClusterToTAV();
+        
         try {
-            c.convert("arquivo.txt", "newFile.arff",new int[0]);
+            String[] arr = args[2].split(",");
+            int[] posicoes = new int[arr.length];
+            for (int i = 0; i < arr.length; i++) {
+                try {
+                    posicoes[i] = Integer.parseInt(arr[i]);
+                } catch (NumberFormatException nfe) {
+                    System.out.println("Algum numero digitado errado...");
+                }
+            }
+
+            c.convert(args[0], args[1], posicoes);
         } catch (IOException ex) {
             Logger.getLogger(ConvertClusterToTAV.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
+    public static void help() {
+        System.out.println("Falta digitar os parametros:");
+        System.out.println("source file targetFile 0-9,0-9,*");
+        System.exit(0);
+    }
+
     private void convert(String oldFile, String newFile, int[] posicoes) throws FileNotFoundException, IOException {
-        createHeader(oldFile, newFile);
+        createHeader(oldFile, newFile, posicoes.length);
+        String[] classesInstancias = getClasses("classesAtributos.txt").split(",");
         String linha;
-        String classes = getClasses();
+        int i = 0;
         try (FileReader fr = new FileReader(oldFile); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
                 linha = br.readLine();
@@ -66,7 +79,9 @@ public class ConvertClusterToTAV {
                             li.remove(posicao);
                         }
                         linha = li.toString().replaceAll("\\[|\\]", "");
-                        salvaLinhaDados("newFile.arff", linha);
+                        linha += "," + classesInstancias[i];
+                        salvaLinhaDados(newFile, linha);
+                        i++;
                     }
                 }
             }
@@ -84,15 +99,18 @@ public class ConvertClusterToTAV {
         }
     }
 
-    private void createHeader(String oldFile, String newFile) throws IOException {
+    private void createHeader(String oldFile, String newFile, int tamanho) throws IOException {
         int numeroColunas = getNumeroColunas(oldFile);
+        numeroColunas -= tamanho;
         StringBuilder sb = new StringBuilder();
         sb.append("@RELATION teste").append("\n\n");
         for (int i = 0; i < numeroColunas; i++) {
             sb.append("@ATTRIBUTE ");
-            sb.append("A").append(i);
+            sb.append("C").append(i);
             sb.append("	REAL\n");
         }
+        String classes = getClasses("classes.txt");
+        sb.append(classes).append("\n");
         sb.append("\n\n");
         sb.append("@DATA");
         salvaLinhaDados(newFile, sb.toString());
@@ -124,8 +142,8 @@ public class ConvertClusterToTAV {
         return 0;
     }
 
-    private String getClasses() throws FileNotFoundException, IOException {
-        try (FileReader fr = new FileReader("classes.txt"); BufferedReader br = new BufferedReader(fr)) {
+    private String getClasses(String fileName) throws FileNotFoundException, IOException {
+        try (FileReader fr = new FileReader(fileName); BufferedReader br = new BufferedReader(fr)) {
             while (br.ready()) {
                 return br.readLine();
             }
