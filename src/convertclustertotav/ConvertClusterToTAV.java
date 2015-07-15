@@ -55,7 +55,7 @@ public class ConvertClusterToTAV {
         System.exit(0);
     }
 
-    private void convert(String oldFile, String newFile, int[] posicoes) throws FileNotFoundException, IOException {
+    public void convert(String oldFile, String newFile, int[] posicoes) throws FileNotFoundException, IOException {
         createHeader(oldFile, newFile, posicoes.length);
         String[] classesInstancias = getClasses("classesAtributos.txt").split(",");
         String linha;
